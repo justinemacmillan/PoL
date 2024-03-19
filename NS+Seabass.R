@@ -23,7 +23,7 @@
     sp_NS <- c(sp_NS, "E. Seabass")
     
 # Create a df to base to mizerParams on
-  # base df: has species names
+  # species common names
     sp_NS <- data.frame(species = sp_NS)
     # add metadata which explains species choice in the species column
       comment(sp_NS$species) <- "We use the species choice made by Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238 and add Sebass as it is predicted that the NS will become more suitable for it by Townhill et al., 2023 https://doi.org/10.1111/faf.12773"
@@ -62,17 +62,40 @@
           
           comment(max_size$l_max) <- "We used rfishbase::species to gather the l_max information from the Fishbase dataset."
                           
-  # a and b weight-length conversion
-    length_weight <- rfishbase::estimate(sp_NS$latin_name, fields = c("Species", "a", "b"))
-    
-    # combining a&b df with l_max&names df
-      sp_NS <- sp_NS |> 
-        left_join(length_weight, by = c("latin_name" = "Species")) |> 
-        left_join(max_size) |> 
-        mutate(w_inf = a*l_max*b)
-      
-      # add comments to the columns
-        comment(sp_NS$a) <- "Taken from the 'a' column in the 'estimates' table on Fishbase."
-        comment(sp_NS$b) <- "Taken from the 'b' column in the 'estimates' table on Fishbase."
-        comment(sp_NS$w_inf) <- "Calculated from 'l_max' using weight-length parameters 'a' and 'b'."
+      # a and b weight-length conversion
+        length_weight <- rfishbase::estimate(sp_NS$latin_name, fields = c("Species", "a", "b"))
+        
+        # combining a&b df with l_max&names df
+          sp_NS <- sp_NS |> 
+            left_join(length_weight, by = c("latin_name" = "Species")) |> 
+            left_join(max_size) |> 
+            mutate(w_inf = a*l_max^b)
           
+          # add comments to the columns
+            comment(sp_NS$a) <- "Taken from the 'a' column in the 'estimates' table on Fishbase."
+            comment(sp_NS$b) <- "Taken from the 'b' column in the 'estimates' table on Fishbase."
+            comment(sp_NS$w_inf) <- "Calculated from 'l_max' using weight-length parameters 'a' and 'b'."
+    
+  # adding the growth parameters
+    # extracting the age and length at maturity
+      maturity_tbl <- rfishbase::maturity(sp_NS$latin_name) # provides many data points for each species
+      median_maturity <- maturity_tbl |> 
+        group_by(Species) |> 
+        filter(!is.na(tm), !is.na(Lm)) |> 
+        summarise(age_mat = median(tm),
+                  l_mat = median(Lm))
+      median_maturity
+    
+    # adding the age, length and weight at maturity to the sp_NS df
+      sp_NS <- sp_NS |> 
+        left_join(median_maturity, by = c("latin_name" = "Species")) |> 
+        mutate(w_mat = a*l_mat^b)
+      
+      # add comments
+        comment(sp_NS$l_mat) <- "Median of `Lm` over all observations on the 'maturity' table on FishBase that had both `Lm` and `tm`."
+        comment(sp_NS$age_mat) <- "Median of `tm` over all observations on the 'maturity' table on FishBase that had both `Lm` and `tm`."
+        comment(sp_NS$w_mat) <- "Calculated from `l_mat` using weight-length parameters `a` and `b`."
+        
+    # calculating the h variable
+      sp_NS$h <- get_h_default(sp_NS)
+      comment(sp_NS$h) <- "Calculated from 'age_mat' and 'w_mat' using 'get_h_default()'."
