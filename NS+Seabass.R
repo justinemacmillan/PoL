@@ -30,7 +30,7 @@
   
   # add a column with the scientific names of each species
       sp_NS$latin_name <- c("Sprattus sprattus", # Sprat
-                         "Ammodutyes marinus", # Sandeel
+                         "Ammodytes marinus", # Sandeel
                          "Trisopterus esmarkii", # Norway Pout
                          "Clupea harengus", # Herring
                          "Limanda limanda", # Common Dab
@@ -42,21 +42,37 @@
                          "Gadus morhua", # Cod
                          "Pollachius virens", # Saithe
                          "Dicentrarchus labrax") # European Seabass
-      comment(sp_NS$latin_name) <- "used the latin names provided by Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238 and the latin name found in Fishbase page for European Seabass"
+      comment(sp_NS$latin_name) <- "We used the latin names provided by Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238 and the latin name found in Fishbase page for European Seabass"
 
   # add asymptotic size (w_inf). Asymptotic size is the maximum w_inf, not an average
       # using rfishbase::species() to extract relevant information from Fishbase database
-          max_size_fishbase <- rfishbase::species(sp_NS[,2]) |>
-            select(latin_name = Species, l_max = Length)
+          max_size_fishbase <- rfishbase::species(sp_NS$latin_name) |>
+              select(latin_name = Species, l_max = Length)
           
-      # combining the df to have one master df
+      # combining l_max df with names df
           max_size <- max_size_fishbase |>
             left_join(select(sp_NS, species, latin_name),
                       by = "latin_name")
-          max_size <- bind_rows(max_size, max_size_fishbase) |>
-            select(species, l_max)
-          max_size
+          # Reorder the columns of max_size_fishbase
+          max_size <- max_size %>%
+            dplyr::select(species, latin_name, l_max)
+          
+          # add comments to the latin_name and l_max columns
+          comment(max_size$latin_name) <- "We used the latin names provided by Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238 and the latin name found in Fishbase page for European Seabass."
+          
+          comment(max_size$l_max) <- "We used rfishbase::species to gather the l_max information from the Fishbase dataset."
                           
-                         
+  # a and b weight-length conversion
+    length_weight <- rfishbase::estimate(sp_NS$latin_name, fields = c("Species", "a", "b"))
     
-  
+    # combining a&b df with l_max&names df
+      sp_NS <- sp_NS |> 
+        left_join(length_weight, by = c("latin_name" = "Species")) |> 
+        left_join(max_size) |> 
+        mutate(w_inf = a*l_max*b)
+      
+      # add comments to the columns
+        comment(sp_NS$a) <- "Taken from the 'a' column in the 'estimates' table on Fishbase."
+        comment(sp_NS$b) <- "Taken from the 'b' column in the 'estimates' table on Fishbase."
+        comment(sp_NS$w_inf) <- "Calculated from 'l_max' using weight-length parameters 'a' and 'b'."
+          

@@ -1,0 +1,9 @@
+---
+title: "Questions for Jon"
+author: "Justine Macmillan"
+date: "2024-03-19"
+output: html_document
+---
+
+1. When writing comments (e.g. for the columns of my dataset) do I use "we" or "I" or just ignore it (e.g. used data from so and so. instead of we used or I used)
+
