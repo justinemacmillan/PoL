@@ -99,3 +99,28 @@
     # calculating the h variable
       sp_NS$h <- get_h_default(sp_NS)
       comment(sp_NS$h) <- "Calculated from 'age_mat' and 'w_mat' using 'get_h_default()'."
+      
+  # Predation kernel
+    # finding beta (PPMR) and sigma (width of predation kernel) values
+      beta_sigma <- select(NS_species_params, species, beta, sigma)
+      
+    # for the mean time: will use same values as cod for Seabass, until I can find better ones (TO DO)
+    # TO DO: find a paper that says that cod and Seabass are similar fish in modelling terms
+      
+      # Create a new row for E.Seabass with beta and sigma values equal to Cod's values
+      new_row <- data.frame(species = "E. Seabass",
+        beta = beta_sigma$beta[which(beta_sigma$species == "Cod")],
+        sigma = beta_sigma$sigma[which(beta_sigma$species == "Cod")])
+      
+      # Add the new row to the existing data frame
+      beta_sigma <- rbind(beta_sigma, new_row)
+      
+    # adding the predation kernel values to our df
+
+        # Adding the predation kernel values to our df
+        sp_NS <- sp_NS %>%
+        left_join(beta_sigma, by = "species")
+        
+    # comment on the sigma and beta columns
+        comment(sp_NS$beta) <- comment(sp_NS$sigma) <- "Taken from Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238, E. Seabass values coppied from cod as they are similar species."
+      
