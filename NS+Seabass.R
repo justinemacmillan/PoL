@@ -20,7 +20,7 @@
     sp_NS <- NS_species_params$species
     
   # we will include European Seabass following Townhill et al., 2023 which states that the NS will become more habitable for them
-    sp_NS <- c(sp_NS, "E. Seabass")
+    sp_NS <- c(sp_NS, "E.Seabass")
     
 # Create a df to base to mizerParams on
   # species common names
@@ -108,12 +108,12 @@
     # TO DO: find a paper that says that cod and Seabass are similar fish in modelling terms
       
       # Create a new row for E.Seabass with beta and sigma values equal to Cod's values
-      new_row <- data.frame(species = "E. Seabass",
+      S_pred_kernel <- data.frame(species = "E.Seabass",
         beta = beta_sigma$beta[which(beta_sigma$species == "Cod")],
         sigma = beta_sigma$sigma[which(beta_sigma$species == "Cod")])
       
       # Add the new row to the existing data frame
-      beta_sigma <- rbind(beta_sigma, new_row)
+      beta_sigma <- rbind(beta_sigma, S_pred_kernel)
       
     # adding the predation kernel values to our df
 
@@ -122,7 +122,7 @@
         left_join(beta_sigma, by = "species")
         
     # comment on the sigma and beta columns
-        comment(sp_NS$beta) <- comment(sp_NS$sigma) <- "Taken from Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238, E. Seabass values coppied from cod as they are similar species."
+        comment(sp_NS$beta) <- comment(sp_NS$sigma) <- "Taken from Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238, E.Seabass values coppied from cod as they are similar species."
     
   # Abundances
     # use an average of real-world conditions as ecosystems are said to fluctuate around the steady state See https://mizer.course.nov22.sizespectrum.org/build/find-species-parameters.html#abundances
@@ -134,18 +134,25 @@
     
     # Find the row index for "Cod"
     cod_row_index <- which(rownames(NS_int) == "Cod")
+    cod_col_index <- which(colnames(NS_int) == "Cod")
     
-    # Copy the row for "Cod" to create a new row for "E. Seabass"
-    Seabass_column <- data.frame(NS_int[cod_row_index, ])
-    Seabass_row <- t(Seabass_column)
-    Seabass_row[["E. Seabass"]] <- 1
-    Seabass_row <- t(Seabass_row)
+    # Copy the row for "Cod" to create a new row for "E.Seabass"
+    Seabass_row <- t(data.frame(NS_int[cod_row_index, ]))
+    Seabass_column <- data.frame(NS_int[,cod_col_index])
     
-    # Replace the species name with "E. Seabass"
-    rownames(Seabass_row) <- "E. Seabass"
-    colnames(Seabass_column) <- "E. Seabass"
+    # Replace the species name with "E.Seabass"
+    Seabass_row <- data.frame(Seabass_row)
+    rownames(Seabass_row) <- "E.Seabass"
+    colnames(Seabass_column) <- "E.Seabass"
     
+    # bind new Seabass interaction column to Blanchard's intercation matrix
     NS_int <- cbind(NS_int, Seabass_column)
     
-    # Add Seabass_row as a new row to NS_int
-    NS_int <- rbind(NS_int, Seabass_row)
+    # create a new cell in the row for E.Seabass * E.Seabass
+    print(Seabass_row)
+    # Create a new column in Seabass_col with 1 as default interaction value
+      s1 <- Seabass_row$E.Seabass <- 1
+      s1 <- Seabass_row
+    
+    # bind the Seabass row to the interactions matrix
+    NS_int <- rbind(NS_int, s1)
