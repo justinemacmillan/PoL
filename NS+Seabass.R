@@ -156,3 +156,28 @@
     
     # bind the Seabass row to the interactions matrix
     NS_int <- rbind(NS_int, s1)
+
+  # Gear parameters
+    NS_gears <- NS_params@gear_params    
+    # Seabass is typically caught by otter trawling https://www.mcsuk.org/goodfishguide/ratings/wild-capture/992/ ; minimum catch size in UK is 42 cm https://www.gov.uk/government/publications/bass-industry-guidance-2023/bass-fishing-guidance-2023#:~:text=The%20minimum%20size%20of%20European,by%20fixed%20or%20drift%20nets.
+      
+      # Create a new row with the provided information
+      S_gears <- data.frame(
+        gear = "Otter",
+        species = "E.Seabass",
+        sel_func = "knife_edge",
+        knife_edge_size = 42,
+        catchability = 1)
+
+      
+      # Add the new row to the existing dataframe
+      NS_gears <- rbind(NS_gears, S_gears)
+
+      # Change the last row name to "E.Seabass, Otter"
+      rownames(NS_gears)[nrow(NS_gears)] <- "E.Seabass, Otter"
+      
+      # Print the updated dataframe
+      print(NS_gears)
+      
+      # Seems to be that (TO DO: find ref) for knife-edge fishing L25 and L50 values are not required
+      
