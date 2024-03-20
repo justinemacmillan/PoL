@@ -22,7 +22,7 @@
   # we will include European Seabass following Townhill et al., 2023 which states that the NS will become more habitable for them
     sp_NS <- c(sp_NS, "E.Seabass")
     
-# Create a df to base to mizerParams on
+# Collect necessary parameter values
   # species common names
     sp_NS <- data.frame(species = sp_NS)
     # add metadata which explains species choice in the species column
@@ -180,4 +180,18 @@
       print(NS_gears)
       
       # Seems to be that (TO DO: find ref) for knife-edge fishing L25 and L50 values are not required
+      
+# create a MizerParams object
+  NS_S_params <- mizer::newMultispeciesParams(sp_NS)
+  
+  #run to steady state
+  NS_S_params <- steady(NS_S_params)
+  
+# create MizerSim     
+  NS_S_sim <- project(NS_S_params)
+  
+# plots
+  plot(NS_S_sim)
+  plotGrowthCurves(NS_S_params, species = "E.Seabass")
+      
       
