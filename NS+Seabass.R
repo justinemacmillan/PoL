@@ -123,4 +123,29 @@
         
     # comment on the sigma and beta columns
         comment(sp_NS$beta) <- comment(sp_NS$sigma) <- "Taken from Blanchard et al., 2014 https://doi.org/10.1111/1365-2664.12238, E. Seabass values coppied from cod as they are similar species."
+    
+  # Abundances
+    # use an average of real-world conditions as ecosystems are said to fluctuate around the steady state See https://mizer.course.nov22.sizespectrum.org/build/find-species-parameters.html#abundances
       
+    # stock assessments are available for the NS, however the data comes with its own assumptions because they are single species estimates
+      
+  # Species interaction matrix
+    NS_int <- NS_params@interaction
+    
+    # Find the row index for "Cod"
+    cod_row_index <- which(rownames(NS_int) == "Cod")
+    
+    # Copy the row for "Cod" to create a new row for "E. Seabass"
+    Seabass_column <- data.frame(NS_int[cod_row_index, ])
+    Seabass_row <- t(Seabass_column)
+    Seabass_row[["E. Seabass"]] <- 1
+    Seabass_row <- t(Seabass_row)
+    
+    # Replace the species name with "E. Seabass"
+    rownames(Seabass_row) <- "E. Seabass"
+    colnames(Seabass_column) <- "E. Seabass"
+    
+    NS_int <- cbind(NS_int, Seabass_column)
+    
+    # Add Seabass_row as a new row to NS_int
+    NS_int <- rbind(NS_int, Seabass_row)
