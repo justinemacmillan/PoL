@@ -192,6 +192,10 @@
   
 # plots
   plot(NS_S_sim)
-  plotGrowthCurves(NS_S_params, species = "E.Seabass")
-      
+  # plotGrowthCurves(NS_S_params, species = "E.Seabass")
+  plot(NS_sim)
+  
+  plot(NS_S_sim, species="E.Seabass")
+  plot(NS_S_sim, species="Cod")
+  plot(NS_sim, species = "Cod")
       
