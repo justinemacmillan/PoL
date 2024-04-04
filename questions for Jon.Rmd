@@ -6,5 +6,6 @@ output: html_document
 ---
 
 1. When writing comments (e.g. for the columns of my dataset) do I use "we" or "I" or just ignore it (e.g. used data from so and so. instead of we used or I used)
+  Answer: Use the Royal we
 
 2. Where would you recommend that I find beta and sigma values for European Seabass (predation kernel)
