@@ -156,43 +156,54 @@ print(NS_S_gears)
 
 #### making the MizerParams object ####
 # create a MizerParams object
-NS_S_params <- mizer::newMultispeciesParams(species_params = NS_S_values,
-                                            gear_params = NS_S_gears,
-                                            interaction = NS_S_interaction, 
-                                            initial_effort = 1)
+# not steady state
+  NS_S_params_notSteady <- mizer::newMultispeciesParams(species_params = NS_S_values,
+                                              gear_params = NS_S_gears,
+                                              interaction = NS_S_interaction, 
+                                              initial_effort = 1)
+  NS_S_sim_notSteady <- project(NS_S_params_notSteady, effort = 0, progress_bar = TRUE)
 
-# Add metadata to the model
-NS_S_params <- setMetadata(NS_S_params,
-                           title = "North Sea model with Seabass added")
+# Steady state
+  NS_S_params <- mizer::newMultispeciesParams(species_params = NS_S_values,
+                                              gear_params = NS_S_gears,
+                                              interaction = NS_S_interaction, 
+                                              initial_effort = 1)
+  NS_S_params <- steady(NS_S_params)
+  NS_S_sim <- project(NS_S_params, effort = 1, progress_bar = TRUE)
 
-#run to steady state
-NS_S_params <- steady(NS_S_params)
-# Let's see what our Biomass density curve looks like
-plotlySpectra(NS_S_params, power = 2)
-# Seabass has a rather low abundance compared to other species
 
-# Calibrate the model
-# Calibration had been done by Blanchard et al., 2014 so we didn't recalibrate in order to be able to compare results between NS and NS_S models
-
-#### Making the MizerSim Object ####
-# create MizerSim     
-NS_S_sim <- project(NS_S_params, effort = 1, progress_bar = TRUE)
-
-#### plotting NS_S ####
-# plots
-plot(NS_S_sim)
-animate
-plotGrowthCurves(NS_S_params, species = "E.Seabass")
-
-sim <- project(NS_params, effort = 1)
-plot(sim)
-plot(NS_S_sim, species="E.Seabass")
-# Biomass (g) graph seems to say that there's loads of Seabass up to year 60 when it starts dropping drasticly until there is no more Seabass at 100 years. Seabass max age is 30 so how is this possible? or is the species going extinct?
-# Also why is Seabass not subjected to any Fing pressure? I added the gear values? Do I need to add Effort values?
-plot(NS_S_sim, species="Cod")
-# why is Cod's B density flipped?
-plot(NS_sim, species = "Cod")
-plotDiet(NS_S_params)
+# # Add metadata to the model
+# NS_S_params <- setMetadata(NS_S_params,
+#                            title = "North Sea model with Seabass added")
+# 
+# #run to steady state
+# NS_S_params <- steady(NS_S_params)
+# # Let's see what our Biomass density curve looks like
+# plotlySpectra(NS_S_params, power = 2)
+# # Seabass has a rather low abundance compared to other species
+# 
+# # Calibrate the model
+# # Calibration had been done by Blanchard et al., 2014 so we didn't recalibrate in order to be able to compare results between NS and NS_S models
+# 
+# #### Making the MizerSim Object ####
+# # create MizerSim     
+# NS_S_sim <- project(NS_S_params, effort = 1, progress_bar = TRUE)
+# 
+# #### plotting NS_S ####
+# # plots
+# plot(NS_S_sim)
+# animate
+# plotGrowthCurves(NS_S_params, species = "E.Seabass")
+# 
+# sim <- project(NS_params, effort = 1)
+# plot(sim)
+# plot(NS_S_sim, species="E.Seabass")
+# # Biomass (g) graph seems to say that there's loads of Seabass up to year 60 when it starts dropping drasticly until there is no more Seabass at 100 years. Seabass max age is 30 so how is this possible? or is the species going extinct?
+# # Also why is Seabass not subjected to any Fing pressure? I added the gear values? Do I need to add Effort values?
+# plot(NS_S_sim, species="Cod")
+# # why is Cod's B density flipped?
+# plot(NS_sim, species = "Cod")
+# plotDiet(NS_S_params)
 
 # To do: NS_S
 # Predation kernel default is 30, does that seem reasonable or should I stick to Cod values?
