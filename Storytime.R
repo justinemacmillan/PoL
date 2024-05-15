@@ -106,26 +106,31 @@
     plotBiomass(NS_S_his)
     plotSpectra(NS_S_his)
 
-#### default initialN and effort=0 ####
-  # project NS_params with a constant fishing effort of 0. Note that we did not set the initial abundance, mizer will   
+#### default SB initalN; Effort=0 ####
+  # run to steady state and project NS_params with a constant fishing effort of 0. 
     NS_params_def <- NS_sim@params
     NS_params_def <- steady(NS_params_def)
     NS_sim_steady0 <- project(NS_params, t_max = 20, effort = 0)
 
-NS_S_params_def <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, inter)
-species_params(NS_S_params_def)["E.Seabass", "linecolour"] <- "darkorange1"
-NS_S_params_def <- steady(NS_S_params_def)
-NS_S_def0 <- project(NS_S_params_def, t_max = 20, effort = 0)
+  # use addSpecies() again to create a MizerParams containing blanchard' North sea species and SB
+    NS_S_params_def <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, inter)
+  # change line colour to make sea bass lines more visible
+    species_params(NS_S_params_def)["E.Seabass", "linecolour"] <- "darkorange1"
+  # run to steady state. Note, we did not set sea bass's initialN so mizer will choose a default value.
+    NS_S_params_def <- steady(NS_S_params_def)
+  # project for 20 years at 0 fishing effort
+    NS_S_def0 <- project(NS_S_params_def, t_max = 20, effort = 0)
 
-NS_S_def0@params@initial_n
+  # Figure 3: SB biomass drops by several orders of magnitude. SB, cod, and saithe's size spectra show an unconventional curve.
+    plotBiomass(NS_sim_steady0)
+    plotSpectra(NS_sim_steady0)
+    plotBiomass(NS_S_def0)
+    plotSpectra(NS_S_def0)
+  
+  # Figure S3: screenshots taken every 2 years show that largest size class maintains the same biomass density, while size classes below drop in abundance. 
+    animateSpectra(NS_sim_steady0)
 
-plotBiomass(NS_sim_steady0)
-plotSpectra(NS_sim_steady0)
-plotBiomass(NS_S_def0)
-plotSpectra(NS_S_def0)
-animateSpectra(NS_sim_steady0)
-
-#### default initialN and effort=1 ####
+#### default SB initialN and effort=1 ####
 NS_params <- steady(NS_sim@params)
 NS_sim_steady1 <- project(NS_params, t_max = 20, effort = 1)
 
