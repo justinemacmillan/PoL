@@ -1,44 +1,95 @@
-library(mizer)
-library(mizerExperimental)
-library(readxl)
-library(dplyr)
-library(ggplot2)
+################################################################################
+# Modelling Sea Bass in the North Sea
+# Justine Laura Macmillan
+#
+# Submitted in partial fulfillment of the requirements
+# for the degree of Integrated Masters in Biology (MBiol)
+# University of York
+# Department of Biology
+# May 2024
+#
+################################################################################
+#
+# Aim: to model Sea Bass in the North Sea, starting from the North Sea
+# model produced by (Blanchard et al., 2014 doi: 10.1111/1365-2664.12238).
+#
+#
+################################################################################
+#
+# Models:
+# NS_sim_steady - the model produced by Blanchard et al., distributed with Mizer, run to steady state
+# NS_S_his - NS_sim extended to include European sea bass. InitialN and effort are based on Blanchard's historical values
+# NS_S_def - NS_sim extended to include European sea bass. InitialN is set to default and effort is set as a constant value which varies between 0, 1, and 2 (NS_S_def0, NS_S_def1, NS_S_def2).
+#
+################################################################################
 
+# Background:
+# CC will cause temperatures to increase, as a result, the North Sea (NS) will become a more favourable habitat for European sea bass (Townhill et al., 2023; DOI: 10.1111/faf.12773). A published model already exists of the Nort sea (Blanchard et al., 2014 doi: 10.1111/1365-2664.12238)
 
-#### load parameters ####
-SB_params <- read_excel("Cod=Seabass/SB_params.xlsx")
-SB_gear <- read_excel("Cod=Seabass/SB_gear.xlsx")
-SB_initial_effort <- read_excel("Cod=Seabass/SB_initial_effort.xlsx")
-SB_initial_effort <- apply(SB_initial_effort, 2, as.numeric)
-inter <- read_excel("Cod=Seabass/inter.xlsx")
-row_names <- inter[[1]]
-inter <- inter[, -1]
-inter <- apply(inter, 2, as.numeric)
-inter <- as.matrix(inter)
-rownames(inter) <- row_names
-effort_NS_S <- matrix(nrow = 44, ncol = 13)
-effort_NS_S[, 1:12] <- NS_sim@effort
-effort_NS_S[, 13] <- effort_NS_S[, 11]
-colnames(effort_NS_S) <- row_names
-rownames(effort_NS_S) <- rownames(NS_sim@effort)
-NS_initialN <- NS_sim@params@initial_n
-SB_initialN <- read_excel("Cod=Seabass/initialN.xlsx")
-SB_initialN <- select(SB_initialN, -"...1")
-rownames(SB_initialN) <- "E.Seabass"
-colnames(SB_initialN) <- colnames(NS_initialN)
-NS_S_initialN <- rbind(NS_initialN, SB_initialN)
-NS_S_initialN <- as.matrix(NS_S_initialN)
+################################################################################
 
-#### historical F effort ####
-NS_S_params_his <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, inter)
-initialN(NS_S_params_his) <- NS_S_initialN
-species_params(NS_S_params_his)["E.Seabass", "linecolour"] <- "darkorange1"
-NS_S_params_his <- steady(NS_S_params_his)
-NS_S_his <- project(NS_S_params_his, t_max = 20, effort = effort_NS_S)
+# Load required libraries
+  library(mizer)
+  library(mizerExperimental)
+  library(readxl)
+  library(dplyr)
+  library(ggplot2)
 
-# Seabass is acting like a normal species!
-# plotGrowthCurves(NS_S_his, species = "E.Seabass")
-# plotSpectra(NS_S_his, species = "E.Seabass")
+# load parameters 
+  # sea bass species parameters (species, w_mat, w_mat25, w_max, and k_vb are sea bass specific, the rest of the values have been duplicated from cod)
+    SB_params <- read_excel("Cod=Seabass/SB_params.xlsx")
+  # sea bass fishing gear (values duplicated from cod)
+    SB_gear <- read_excel("Cod=Seabass/SB_gear.xlsx")
+  # sea bass initial fishing effort (values duplicated from cod)
+    SB_initial_effort <- read_excel("Cod=Seabass/SB_initial_effort.xlsx")
+    SB_initial_effort <- apply(SB_initial_effort, 2, as.numeric)
+  # sea bass interaction (values duplicated from cod)
+    inter <- read_excel("Cod=Seabass/inter.xlsx")
+    row_names <- inter[[1]]
+    inter <- inter[, -1]
+    inter <- apply(inter, 2, as.numeric)
+    inter <- as.matrix(inter)
+    rownames(inter) <- row_names
+  # North Sea + sea bass historical fishing effort values (sea bass values duplicatd from cod)
+    effort_NS_S <- matrix(nrow = 44, ncol = 13)
+    effort_NS_S[, 1:12] <- NS_sim@effort
+    effort_NS_S[, 13] <- effort_NS_S[, 11]
+    colnames(effort_NS_S) <- row_names
+    rownames(effort_NS_S) <- rownames(NS_sim@effort)
+  # North Sea and sea bass initialN (sea bass initial abundance is set to be at 1/10th of cod's initialN)
+    NS_initialN <- NS_sim@params@initial_n
+    SB_initialN <- read_excel("Cod=Seabass/initialN.xlsx")
+    SB_initialN <- select(SB_initialN, -"...1")
+    rownames(SB_initialN) <- "E.Seabass"
+    colnames(SB_initialN) <- colnames(NS_initialN)
+    NS_S_initialN <- rbind(NS_initialN, SB_initialN)
+    NS_S_initialN <- as.matrix(NS_S_initialN)
+
+#### historical F effort (NS_S_his) ####
+  # addSpecies() to add sea bass to Blanchard's North Sea model
+    NS_S_params_his <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, inter)
+  # set initialN. initialN is set by Blanchard et al. for all original species and is set to 1/10th of cod's value for sea bass. This is because sea bass is less abundant than cod.
+    initialN(NS_S_params_his) <- NS_S_initialN
+      # Warning: The dimnames do not match. I will ignore them. 
+      # in NS_S_params_his the dims are called $sp and $w. In NS_S_initialN they are called [[1]] and [[2]]. This does not affect the model and can be ignored.
+  # modify sea bass's line colour to dark orange, to make it more visible
+    species_params(NS_S_params_his)["E.Seabass", "linecolour"] <- "darkorange1"
+  # run to steady state
+    NS_S_params_his <- steady(NS_S_params_his)
+  # project MizerParams to a MizerSim (NS_S_his)
+    NS_S_his <- project(NS_S_params_his, t_max = 20, effort = effort_NS_S)
+
+  # Supplementary figure 1: Sea bass is interacting with other species in the ecosystem
+    # It has a normal looking size spectrum curve, with the emblematic bump after w_mat.
+      plotSpectra(NS_S_his, species = "E.Seabass")
+    # It is being fished
+      plotFMort(NS_S_his, species = "E.Seabass")
+    # It is eating fish in the ecosystem as well as the resource
+      plotDiet(NS_S_his@params, species = "E.Seabass")
+    # It is also getting eaten
+      plotPredMort(NS_S_his, species = "E.Seabass")
+    # Finally its growth curve is as expected. It reaches w_max before its maximum recorded age of 30 years.
+      plotGrowthCurves(NS_S_his, species = "E.Seabass")
 
 NS_params <- steady(NS_sim@params)
 NS_sim_steady <- project(NS_params, t_max = 20, effort = NS_sim@effort)
