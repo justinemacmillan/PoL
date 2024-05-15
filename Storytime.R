@@ -106,7 +106,7 @@
     plotBiomass(NS_S_his)
     plotSpectra(NS_S_his)
 
-#### default SB initalN; Effort=0 ####
+#### default SB initialN and effort=0 ####
   # run to steady state and project NS_params with a constant fishing effort of 0. 
     NS_params_def <- NS_sim@params
     NS_params_def <- steady(NS_params_def)
@@ -131,123 +131,115 @@
     animateSpectra(NS_sim_steady0)
 
 #### default SB initialN and effort=1 ####
-NS_params <- steady(NS_sim@params)
-NS_sim_steady1 <- project(NS_params, t_max = 20, effort = 1)
+  # Same sequence of steps as default "SB initalN; Effort=0", changed fishing effort to 1
+    NS_params <- steady(NS_sim@params)
+    NS_sim_steady1 <- project(NS_params, t_max = 20, effort = 1)
+    
+    NS_S_def1 <- project(NS_S_params_def, t_max = 20, effort = 1)
 
-NS_S_def1 <- project(NS_S_params_def, t_max = 20, effort = 1)
+  # Figure 4: SB biomass drops but only solightly, all size spectra look normal
+    plotBiomass(NS_sim_steady1)
+    plotSpectra(NS_sim_steady1)
+    plotBiomass(NS_S_def1)
+    plotSpectra(NS_S_def1)
 
-plotBiomass(NS_sim_steady1)
-plotSpectra(NS_sim_steady1)
-plotBiomass(NS_S_def1)
-plotSpectra(NS_S_def1)
+#### default SB initialN and effort=2 ####
+  # Same sequence of steps as default "SB initalN; Effort=0", changed fishing effort to 2
+    NS_params <- steady(NS_sim@params)
+    NS_sim_steady2 <- project(NS_params, t_max = 20, effort = 2)
 
-#### default initialN and effort=2 ####
-NS_params <- steady(NS_sim@params)
-NS_sim_steady2 <- project(NS_params, t_max = 20, effort = 2)
+    NS_S_def2 <- project(NS_S_params_def, t_max = 20, effort = 2)
 
-NS_S_def2 <- project(NS_S_params_def, t_max = 20, effort = 2)
-
-plotBiomass(NS_sim_steady2)
-plotSpectra(NS_sim_steady2)
-plotBiomass(NS_S_def2)
-plotSpectra(NS_S_def2)
-
+  # Figure 5: SB biomass drops by 3 orders of magnitude, size spectra look normal for all species
+    plotBiomass(NS_sim_steady2)
+    plotSpectra(NS_sim_steady2)
+    plotBiomass(NS_S_def2)
+    plotSpectra(NS_S_def2)
 
 #### initialN ####
 # The initialN used in all 3 def models are the same
-iN_0_1 <- NS_S_def0@params@initial_n - NS_S_def1@params@initial_n
-iN_0_2 <- NS_S_def0@params@initial_n - NS_S_def2@params@initial_n
-compareParams(NS_S_params_his, NS_S_params_def)
-compareParams(NS_S_params_his, NS_params)
+  iN_0_1 <- NS_S_def0@params@initial_n - NS_S_def1@params@initial_n
+  iN_0_2 <- NS_S_def0@params@initial_n - NS_S_def2@params@initial_n
+  compareParams(NS_S_params_his, NS_S_params_def)
+  compareParams(NS_S_params_his, NS_params)
 
 #### Fishing just SB or all but SB ####
 # F=0 for all
-plotBiomass(NS_S_def0) + theme(legend.position="none")
-plotFMort(NS_S_def0)  + theme(legend.position="none")
-plotSpectra(NS_S_def0)  + theme(legend.position="none")
+  plotBiomass(NS_S_def0) + theme(legend.position="none")
+  plotFMort(NS_S_def0)  + theme(legend.position="none")
+  plotSpectra(NS_S_def0)  + theme(legend.position="none")
 
 # F=1 for all
-plotBiomass(NS_S_def1) + theme(legend.position="none")
-plotFMort(NS_S_def1)  + theme(legend.position="none")
-plotSpectra(NS_S_def1)  + theme(legend.position="none")
+  plotBiomass(NS_S_def1) + theme(legend.position="none")
+  plotFMort(NS_S_def1)  + theme(legend.position="none")
+  plotSpectra(NS_S_def1)  + theme(legend.position="none")
 
-
-# F=1 for SB only
-NS_S_F_y1 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1))
-plotBiomass(NS_S_F_y1) + theme(legend.position="none")
-plotFMort(NS_S_F_y1)  + theme(legend.position="none")
-plotSpectra(NS_S_F_y1)  + theme(legend.position="none")
+# F=1 for SB only -> gives plots for Figure 6 
+  # SB goes extinct, only has 1g left in the ecosystem afer 20 years
+  NS_S_F_y1 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1))
+  
+  plotBiomass(NS_S_F_y1) + theme(legend.position="none")
+  plotFMort(NS_S_F_y1)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_y1)  + theme(legend.position="none")
 
 # F=1 for all but SB
-NS_S_F_n1 <- project(NS_S_params_def, t_max = 20, effort = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0))
-plotBiomass(NS_S_F_n1) + theme(legend.position="none")
-plotFMort(NS_S_F_n1)  + theme(legend.position="none")
-plotSpectra(NS_S_F_n1)  + theme(legend.position="none")
+  NS_S_F_n1 <- project(NS_S_params_def, t_max = 20, effort = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0))
+  
+  plotBiomass(NS_S_F_n1) + theme(legend.position="none")
+  plotFMort(NS_S_F_n1)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_n1)  + theme(legend.position="none")
 
 # F=0.5 for SB and F=1 for rest
-NS_S_F_05 <- project(NS_S_params_def, t_max = 20, effort = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5))
-plotBiomass(NS_S_F_05) + theme(legend.position="none")
-plotFMort(NS_S_F_05)  + theme(legend.position="none")
-plotSpectra(NS_S_F_05)  + theme(legend.position="none")
+  NS_S_F_05 <- project(NS_S_params_def, t_max = 20, effort = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5))
+  
+  plotBiomass(NS_S_F_05) + theme(legend.position="none")
+  plotFMort(NS_S_F_05)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_05)  + theme(legend.position="none")
 
 # F=2 for SB
-NS_S_F_y2 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2))
-plotBiomass(NS_S_F_y2) + theme(legend.position="none")
-plotFMort(NS_S_F_y2)  + theme(legend.position="none")
-plotSpectra(NS_S_F_y2)  + theme(legend.position="none")
+  NS_S_F_y2 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2))
+  
+  plotBiomass(NS_S_F_y2) + theme(legend.position="none")
+  plotFMort(NS_S_F_y2)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_y2)  + theme(legend.position="none")
 
 # F=2 for all but SB
-NS_S_F_n2 <- project(NS_S_params_def, t_max = 20, effort = c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0))
-plotBiomass(NS_S_F_n2) + theme(legend.position="none")
-plotFMort(NS_S_F_n2)  + theme(legend.position="none")
-plotSpectra(NS_S_F_n2)  + theme(legend.position="none")
+  NS_S_F_n2 <- project(NS_S_params_def, t_max = 20, effort = c(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0))
+  
+  plotBiomass(NS_S_F_n2) + theme(legend.position="none")
+  plotFMort(NS_S_F_n2)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_n2)  + theme(legend.position="none")
 
 # F=2 for all
-plotBiomass(NS_S_def2) + theme(legend.position="none")
-plotFMort(NS_S_def2)  + theme(legend.position="none")
-plotSpectra(NS_S_def2)  + theme(legend.position="none")
+  plotBiomass(NS_S_def2) + theme(legend.position="none")
+  plotFMort(NS_S_def2)  + theme(legend.position="none")
+  plotSpectra(NS_S_def2)  + theme(legend.position="none")
 
+# F=1 for cod only -> gives plots for Figure 8
+  # SB thrives and sees an increase in biomass over the time range, size spectrum of Cod looks normal, and SB size spectrum curve improves
+  NS_S_F_c1 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0))
+  
+  plotBiomass(NS_S_F_c1) + theme(legend.position="none")
+  plotFMort(NS_S_F_c1)  + theme(legend.position="none")
+  plotSpectra(NS_S_F_c1)  + theme(legend.position="none")
 
-#### plotlyDeath ####
-plotDeath(object = NS_S_def0, species = "E.Seabass")
-plotDeath(object = NS_S_def1, species = "E.Seabass")
-plotDeath(object = NS_S_def2, species = "E.Seabass")
+#### plotDeath ####
+  # Figure 7: plotDeath of Cod, SB, and Saithe at fishing effort = 0. Cod is the leading cause of Cod and SB (due to value duplication) death after 100grams. Saithe is the leading cause of saithe death after 100g.
+  plotDeath(object = NS_S_def0, species = "E.Seabass")
+  plotDeath(object = NS_S_def0, species = "Saithe")
+  plotDeath(object = NS_S_def0, species = "Cod")
+  NS_species_params
 
-plotDeath(object = NS_S_def0, species = "Saithe")
-plotDeath(object = NS_S_def1, species = "Saithe")
-plotDeath(object = NS_S_def2, species = "Saithe")
-
-plotDeath(object = NS_S_def0, species = "Cod")
-plotDeath(object = NS_S_def1, species = "Cod")
-plotDeath(object = NS_S_def2, species = "Cod")
-NS_species_params
-
-#### w_mat dip ####
-
-plotEnergyBudget(NS_S_def1, species = c("Cod", "Saithe", "E.Seabass"))
-# what is income?
+#### w_mat dip starts at 100g not w_mat -> Supplementary figure 2 ####
 
 spectra_plot <- plotSpectra(NS_S_def0, species = c("Cod", "Saithe", "E.Seabass")) +
   geom_vline(xintercept = 1606.0000 , color = "#142300" , linetype = "dashed" , size = 1) +
   geom_vline(xintercept = 1076.0000 , color = "#a08dfb", linetype = "dashed", size = 1) +
   geom_vline(xintercept = 536.4007 , color = "darkorange1" , linetype = "dashed" , size = 1) +
+  geom_vline(xintercept = 100 , color = "red" , linetype = "dashed" , size = 1) +
   labs(title = "Size Spectra with Maturity Sizes")
 print(spectra_plot)
 
-spectra_plot3 <- plotSpectra(NS_S_def0, species = c("Cod","Saithe", "E.Seabass")) +
-  geom_vline(xintercept = 1606.0000 , color = "#142300" , linetype = "dashed" , size = 1) +
-  geom_vline(xintercept = 1076.0000 , color = "#a08dfb", linetype = "dashed", size = 1) +
-  geom_vline(xintercept = 536.4007 , color = "darkorange1" , linetype = "dashed" , size = 1) +
-  labs(title = "Size Spectra with Maturity Sizes")
-print(spectra_plot3)
 
-# changing interaction
-intera <- inter
-intera[11,13] <- 0.5
 
-NS_S_params_def <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, intera)
-species_params(NS_S_params_def)["E.Seabass", "linecolour"] <- "darkorange1"
-NS_S_params_def <- steady(NS_S_params_def)
-NS_S_def0 <- project(NS_S_params_def, t_max = 20, effort = 0)
-plot(NS_S_def0)
 
