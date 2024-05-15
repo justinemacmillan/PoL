@@ -91,23 +91,33 @@
     # Finally its growth curve is as expected. It reaches w_max before its maximum recorded age of 30 years.
       plotGrowthCurves(NS_S_his, species = "E.Seabass")
 
-NS_params <- steady(NS_sim@params)
-NS_sim_steady <- project(NS_params, t_max = 20, effort = NS_sim@effort)
+  # Extract NS_params from Blanchard's model NS_sim@params. Note used NS_sim@params as this is very different from NS_params. NS_sim@params values are more accurate are have been calibrated and tune using real-world data.
+    NS_params <- NS_sim@params
+  # set initialN to NS_params values
+    initialN(NS_params) <- NS_sim@params@initial_n
+  # run NS_params to steady state
+    NS_params <- steady(NS_params)
+  # project NS_params using historical fishing effort
+    NS_sim_steady <- project(NS_params, t_max = 20, effort = NS_sim@effort)
 
-
-plotBiomass(NS_sim_steady)
-plotSpectra(NS_sim_steady)
-plotBiomass(NS_S_his)
-plotSpectra(NS_S_his)
+  # Figure 2: comparing NS_sim_steady (control) and NS_S_his (with sea bass) using historical fishing effort values
+    plotBiomass(NS_sim_steady)
+    plotSpectra(NS_sim_steady)
+    plotBiomass(NS_S_his)
+    plotSpectra(NS_S_his)
 
 #### default initialN and effort=0 ####
-NS_params <- steady(NS_sim@params)
-NS_sim_steady0 <- project(NS_params, t_max = 20, effort = 0)
+  # project NS_params with a constant fishing effort of 0. Note that we did not set the initial abundance, mizer will   
+    NS_params_def <- NS_sim@params
+    NS_params_def <- steady(NS_params_def)
+    NS_sim_steady0 <- project(NS_params, t_max = 20, effort = 0)
 
 NS_S_params_def <- addSpecies(NS_sim@params, SB_params, SB_gear, SB_initial_effort, inter)
 species_params(NS_S_params_def)["E.Seabass", "linecolour"] <- "darkorange1"
 NS_S_params_def <- steady(NS_S_params_def)
 NS_S_def0 <- project(NS_S_params_def, t_max = 20, effort = 0)
+
+NS_S_def0@params@initial_n
 
 plotBiomass(NS_sim_steady0)
 plotSpectra(NS_sim_steady0)
