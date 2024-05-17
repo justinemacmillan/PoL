@@ -86,28 +86,28 @@ NS_S_initialN <- as.matrix(NS_S_initialN)
   
 ####  Plot results ####  
   # Unsteady F=0 (NS)
-  plotBiomass(NS_0)
-  plotSpectra(NS_0)
+    plotBiomass(NS_0)
+    plotSpectra(NS_0)
   
   # Unsteady F=1 (NS)
-  plotBiomass(NS_1)
-  plotSpectra(NS_1)
+    plotBiomass(NS_1)
+    plotSpectra(NS_1)
   
   # Unsteady F=2 (NS)
-  plotBiomass(NS_2)
-  plotSpectra(NS_2)
+    plotBiomass(NS_2)
+    plotSpectra(NS_2)
   
   # Steady F=0 (NS)
-  plotBiomass(NS_steady_0)
-  plotSpectra(NS_steady_0)
+    plotBiomass(NS_steady_0)
+    plotSpectra(NS_steady_0)
   
   # Steady F=1 (NS)
-  plotBiomass(NS_steady_1)
-  plotSpectra(NS_steady_1)
+    plotBiomass(NS_steady_1)
+    plotSpectra(NS_steady_1)
   
   # Steady F=2 (NS)
-  plotBiomass(NS_steady_2)
-  plotSpectra(NS_steady_2)
+    plotBiomass(NS_steady_2)
+    plotSpectra(NS_steady_2)
   
   # Unsteady F=0 (NS_S)
     plotBiomass(NS_S_0)
