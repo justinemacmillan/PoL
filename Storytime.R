@@ -101,10 +101,10 @@
     NS_sim_steady <- project(NS_params, t_max = 20, effort = NS_sim@effort)
 
   # Figure 2: comparing NS_sim_steady (control) and NS_S_his (with sea bass) using historical fishing effort values
-    plotBiomass(NS_sim_steady)
-    plotSpectra(NS_sim_steady)
-    plotBiomass(NS_S_his)
-    plotSpectra(NS_S_his)
+    plotBiomass(NS_sim_steady) + custom_theme()
+    plotSpectra(NS_sim_steady) + custom_theme()
+    plotBiomass(NS_S_his) + custom_theme()
+    plotSpectra(NS_S_his) + custom_theme()
 
 #### default SB initialN and effort=0 ####
   # run to steady state and project NS_params with a constant fishing effort of 0. 
@@ -122,10 +122,10 @@
     NS_S_def0 <- project(NS_S_params_def, t_max = 20, effort = 0)
 
   # Figure 3: SB biomass drops by several orders of magnitude. SB, cod, and saithe's size spectra show an unconventional curve.
-    plotBiomass(NS_sim_steady0)
-    plotSpectra(NS_sim_steady0)
-    plotBiomass(NS_S_def0)
-    plotSpectra(NS_S_def0)
+    plotBiomass(NS_sim_steady0) + custom_theme()
+    plotSpectra(NS_sim_steady0) + custom_theme()
+    plotBiomass(NS_S_def0) + custom_theme()
+    plotSpectra(NS_S_def0) + custom_theme()
   
   # Figure S3: screenshots taken every 2 years show that largest size class maintains the same biomass density, while size classes below drop in abundance. 
     animateSpectra(NS_sim_steady0)
@@ -138,10 +138,10 @@
     NS_S_def1 <- project(NS_S_params_def, t_max = 20, effort = 1)
 
   # Figure 4: SB biomass drops but only solightly, all size spectra look normal
-    plotBiomass(NS_sim_steady1)
-    plotSpectra(NS_sim_steady1)
-    plotBiomass(NS_S_def1)
-    plotSpectra(NS_S_def1)
+    plotBiomass(NS_sim_steady1) + custom_theme()
+    plotSpectra(NS_sim_steady1) + custom_theme()
+    plotBiomass(NS_S_def1) + custom_theme()
+    plotSpectra(NS_S_def1) + custom_theme()
 
 #### default SB initialN and effort=2 ####
   # Same sequence of steps as default "SB initalN; Effort=0", changed fishing effort to 2
@@ -151,10 +151,10 @@
     NS_S_def2 <- project(NS_S_params_def, t_max = 20, effort = 2)
 
   # Figure 5: SB biomass drops by 3 orders of magnitude, size spectra look normal for all species
-    plotBiomass(NS_sim_steady2)
-    plotSpectra(NS_sim_steady2)
-    plotBiomass(NS_S_def2)
-    plotSpectra(NS_S_def2)
+    plotBiomass(NS_sim_steady2) + custom_theme()
+    plotSpectra(NS_sim_steady2) + custom_theme()
+    plotBiomass(NS_S_def2) + custom_theme()
+    plotSpectra(NS_S_def2) + custom_theme()
 
 #### initialN ####
 # The initialN used in all 3 def models are the same
@@ -178,7 +178,7 @@
   # SB goes extinct, only has 1g left in the ecosystem afer 20 years
   NS_S_F_y1 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1))
   
-  plotBiomass(NS_S_F_y1) + theme(legend.position="none")
+  plotBiomass(NS_S_F_y1) + custom_theme()
   plotFMort(NS_S_F_y1)  + theme(legend.position="none")
   plotSpectra(NS_S_F_y1)  + theme(legend.position="none")
 
