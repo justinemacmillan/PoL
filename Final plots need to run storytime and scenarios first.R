@@ -32,3 +32,9 @@ NS_S_F_c1 <- project(NS_S_params_def, t_max = 20, effort = c(0, 0, 0, 0, 0, 0, 0
 plotBiomass(NS_S_F_c1)  + custom_theme()
 plotFMort(NS_S_F_c1)  + custom_theme()
 plotSpectra(NS_S_F_c1)  + custom_theme()
+
+plotSpectra(NS_S_his, species = "E.Seabass")  + custom_theme()
+plotDiet(NS_S_his@params, species = "E.Seabass")  + custom_theme()
+plotGrowthCurves(NS_S_his, species = "E.Seabass")  + custom_theme()
+plotPredMort(NS_S_his, species = "E.Seabass")  + custom_theme()
+plotFMort(NS_S_his, species = "E.Seabass")  + custom_theme()
